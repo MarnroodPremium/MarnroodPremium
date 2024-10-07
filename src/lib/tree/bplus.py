@@ -1,6 +1,7 @@
 from __future__ import annotations
 from math import floor
 
+
 class Node:
     uid_counter = 0
 
@@ -203,7 +204,6 @@ class BPlusTree(object):
         index = node.keys.index(key)
         node.values[index].pop()  # Remove the last inserted data.
 
-
         if len(node.values[index]) == 0:
             node.values.pop(index)  # Remove the list element.
             node.keys.pop(index)
@@ -217,7 +217,7 @@ class BPlusTree(object):
                 if prev_sibling and not prev_sibling.is_nearly_underflowed():
                     self._borrow_left(node, prev_sibling, parent_index)
                 elif next_sibling and not next_sibling.is_nearly_underflowed():
-                    self._borrow_right(node, next_sibling, parent_index) # type: ignore
+                    self._borrow_right(node, next_sibling, parent_index)  # type: ignore
                 elif prev_sibling and prev_sibling.is_nearly_underflowed():
                     self._merge_on_delete(prev_sibling, node)
                 elif next_sibling and next_sibling.is_nearly_underflowed():

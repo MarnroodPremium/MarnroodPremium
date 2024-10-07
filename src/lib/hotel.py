@@ -1,7 +1,8 @@
 from .tree.bplus import BPlusTree
 
+
 class Hotel(BPlusTree):
-    def __init__(self, order = 5):
+    def __init__(self, order=5):
         super().__init__(order)
         self.last_room = 0
         self.ex_guest_start = None
@@ -27,11 +28,10 @@ class Hotel(BPlusTree):
         for i in range((guest * car * boat * spaceship) + ex_guest):
             self.insert_room()
 
-        #return "Done"
+        # return "Done"
 
     def manual_insert(self):
         amount = int(input("Enter amount of ppl : "))
         for i in range(amount):
             self.insert_room()
-            #print("room", self.last_room, "add!")
-            
+            # print("room", self.last_room, "add!")
