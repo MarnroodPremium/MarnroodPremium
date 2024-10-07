@@ -6,7 +6,7 @@ class Node:
 
     def __init__(self, order):
         self.order = order
-        self.parent: Node = None
+        self.parent: Node | None = None
         self.keys = []
         self.values = []
 
@@ -65,8 +65,9 @@ class LeafNode(Node):
     def __init__(self, order):
         super().__init__(order)
 
-        self.prev_leaf: LeafNode = None
-        self.next_leaf: LeafNode = None
+        self.prev_leaf: LeafNode | None = None
+        self.next_leaf: LeafNode | None = None
+        self.values = []
 
     def add(self, key, value):  # TODO: Implement improved version
         if not self.keys:  # Insert key if it doesn't exist
@@ -121,15 +122,16 @@ class BPlusTree(object):
         self.order: int = order
 
     @staticmethod
-    def _find(node: Node, key):
+    def find(node: Node, key):
         for i, item in enumerate(node.keys):
             if key < item:
                 return node.values[i], i
             elif i + 1 == len(node.keys):
                 return node.values[i + 1], i + 1  # return right-most node/pointer.
+        return None, -1  # return default value when key is not found
 
     @staticmethod
-    def _merge_up(parent: Node, child: Node, index):
+    def merge_up(parent: Node, child: Node, index):
         parent.values.pop(index)
         pivot = child.keys[0]
 
@@ -154,17 +156,20 @@ class BPlusTree(object):
         while not isinstance(
             node, LeafNode
         ):  # While we are in internal nodes... search for leafs.
-            node, index = self._find(node, key)
+            if not node:
+                raise AttributeError
+
+            node, index = self.find(node, key)
 
         # Node is now guaranteed a LeafNode!
         node.add(key, value)
 
-        while len(node.keys) == node.order:  # 1 over full
+        while node and node.parent and len(node.keys) == node.order:  # 1 over full
             if not node.is_root():
                 parent = node.parent
                 node = node.split()  # Split & Set node as the 'top' node.
-                jnk, index = self._find(parent, node.keys[0])
-                self._merge_up(parent, node, index)
+                _, index = self.find(parent, node.keys[0])
+                self.merge_up(parent, node, index)
                 node = parent
             else:
                 node = node.split()  # Split & Set node as the 'top' node.
@@ -174,7 +179,9 @@ class BPlusTree(object):
         node = self.root
 
         while not isinstance(node, LeafNode):
-            node, index = self._find(node, key)
+            if not node:
+                return None
+            node, _ = self.find(node, key)
 
         for i, item in enumerate(node.keys):
             if key == item:
@@ -186,7 +193,9 @@ class BPlusTree(object):
         node = self.root
 
         while not isinstance(node, LeafNode):
-            node, parent_index = self._find(node, key)
+            if not node:
+                return False
+            node, parent_index = self.find(node, key)
 
         if key not in node.keys:
             return False
@@ -194,20 +203,21 @@ class BPlusTree(object):
         index = node.keys.index(key)
         node.values[index].pop()  # Remove the last inserted data.
 
+
         if len(node.values[index]) == 0:
             node.values.pop(index)  # Remove the list element.
             node.keys.pop(index)
 
-            while node.is_underflowed() and not node.is_root():
+            while node and node.parent and node.is_underflowed() and not node.is_root():
                 # Borrow attempt:
                 prev_sibling = self.get_prev_sibling(node)
                 next_sibling = self.get_next_sibling(node)
-                jnk, parent_index = self._find(node.parent, key)
+                _, parent_index = self.find(node.parent, key)
 
                 if prev_sibling and not prev_sibling.is_nearly_underflowed():
                     self._borrow_left(node, prev_sibling, parent_index)
                 elif next_sibling and not next_sibling.is_nearly_underflowed():
-                    self._borrow_right(node, next_sibling, parent_index)
+                    self._borrow_right(node, next_sibling, parent_index) # type: ignore
                 elif prev_sibling and prev_sibling.is_nearly_underflowed():
                     self._merge_on_delete(prev_sibling, node)
                 elif next_sibling and next_sibling.is_nearly_underflowed():
@@ -223,8 +233,13 @@ class BPlusTree(object):
                 self.root = node.values[0]
                 self.root.parent = None
 
+        return True
+
     @staticmethod
     def _borrow_left(node: Node, sibling: Node, parent_index):
+        if not node.parent or not node.parent.keys:
+            raise AttributeError
+
         if isinstance(node, LeafNode):  # Leaf Redistribution
             key = sibling.keys.pop(-1)
             data = sibling.values.pop(-1)
@@ -237,18 +252,20 @@ class BPlusTree(object):
             sibling_key = sibling.keys.pop(-1)
             data: Node = sibling.values.pop(-1)
             data.parent = node
-
             node.parent.keys.insert(0, sibling_key)
             node.keys.insert(0, parent_key)
             node.values.insert(0, data)
 
     @staticmethod
     def _borrow_right(node: LeafNode, sibling: LeafNode, parent_index):
+        if not node.parent or not node.parent.keys:
+            raise AttributeError
         if isinstance(node, LeafNode):  # Leaf Redistribution
             key = sibling.keys.pop(0)
             data = sibling.values.pop(0)
             node.keys.append(key)
             node.values.append(data)
+
             node.parent.keys[parent_index] = sibling.keys[0]  # Update Parent
         else:  # Inner Node Redistribution (Push-Through)
             parent_key = node.parent.keys.pop(0)
@@ -264,7 +281,10 @@ class BPlusTree(object):
     def _merge_on_delete(l_node: Node, r_node: Node):
         parent = l_node.parent
 
-        jnk, index = self._find(parent, l_node.keys[0])  # Reset pointer to child
+        if not parent:
+            raise AttributeError
+
+        _, index = BPlusTree.find(parent, l_node.keys[0])  # Reset pointer to child
         parent_key = parent.keys.pop(index)
         parent.values.pop(index)
         parent.values[index] = l_node
@@ -282,21 +302,26 @@ class BPlusTree(object):
     @staticmethod
     def get_prev_sibling(node: Node) -> Node:
         if node.is_root() or not node.keys:
-            return None
-        jnk, index = self._find(node.parent, node.keys[0])
-        return node.parent.values[index - 1] if index - 1 >= 0 else None
+            raise AttributeError
+        if not node.parent:
+            raise AttributeError
+
+        _, index = BPlusTree.find(node.parent, node.keys[0])
+        if not index - 1 >= 0:
+            raise AttributeError
+        return node.parent.values[index - 1]
 
     @staticmethod
     def get_next_sibling(node: Node) -> Node:
         if node.is_root() or not node.keys:
-            return None
-        jnk, index = self._find(node.parent, node.keys[0])
+            raise AttributeError
+        if not node.parent:
+            raise AttributeError
 
-        return (
-            node.parent.values[index + 1]
-            if index + 1 < len(node.parent.values)
-            else None
-        )
+        _, index = BPlusTree.find(node.parent, node.keys[0])
+        if not index + 1 < len(node.parent.values):
+            raise AttributeError
+        return node.parent.values[index + 1]
 
     def show_bfs(self):
         if self.root.is_empty():
