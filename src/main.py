@@ -14,6 +14,7 @@ and 1 spaceship totall
 from lib.hotel import Hotel
 
 manrood = Hotel()
-manrood.invite_stack()
+manrood.initialize()
+print(manrood.last_room)
 manrood.manual_insert()
 print(manrood.last_room)
