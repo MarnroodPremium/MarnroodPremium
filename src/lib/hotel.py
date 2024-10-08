@@ -40,4 +40,6 @@ class Hotel:
             # print("room", self.last_room, "add!")
 
     def export_csv(self, filename: str):
-        export_csv(tree=self.tree, filename=filename)
+        if not self.manual_guest_start:
+            raise AttributeError
+        export_csv(filename=filename, tree=self.tree, channels=self.checkin_channels, manual_start=self.manual_guest_start)

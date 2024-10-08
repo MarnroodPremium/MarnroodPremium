@@ -349,7 +349,7 @@ class BPlusTree(object):
         datas = []
 
         while node:
-            datas.extend(node.values)
+            datas.extend(node.keys)
             node = node.next_leaf
         return datas
 
