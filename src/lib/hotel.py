@@ -1,12 +1,14 @@
+from typing import List
 from .tree.bplus import BPlusTree
 
 
 class Hotel:
     def __init__(self, order: int = 5):
         self.tree = BPlusTree(order)
-        self.last_room = 0
-        self.ex_guest_start = None
-        self.manual_guest_start = None
+        self.last_room: int = 0
+        self.ex_guest_start: None | int = None
+        self.manual_guest_start: None | int = None
+        self.checkin_channels: List[int] = []
 
     def insert_room(self):
         self.last_room += 1
@@ -21,6 +23,7 @@ class Hotel:
         inp = input("Enter amount of peoples/car/boat/spaceship : ")
         guest, car, boat, spaceship = map(int, inp.split("/"))
         print(f"Guests: {guest}, Cars: {car}, Boats: {boat}, Spaceships: {spaceship}")
+        self.checkin_channels = [guest, car, boat, spaceship]
 
         self.ex_guest_start = guest * car * boat * spaceship
         self.manual_guest_start = (guest * car * boat * spaceship) + ex_guest
