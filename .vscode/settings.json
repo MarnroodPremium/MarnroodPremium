@@ -5,7 +5,7 @@
         "diagrams"
     ],
     "python.analysis.typeCheckingMode": "basic",
-    "editor.tabSize": 2,
+    "editor.tabSize": 4,
     "editor.indentSize": "tabSize",
     "pylint.args": [
         "--disable=missing-module-docstring",

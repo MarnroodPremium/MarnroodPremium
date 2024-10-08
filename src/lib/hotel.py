@@ -1,5 +1,6 @@
+from stat import FILE_ATTRIBUTE_NORMAL
 from .tree.bplus import BPlusTree
-
+from .export import export_csv
 
 class Hotel:
     def __init__(self, order: int = 5):
@@ -35,3 +36,6 @@ class Hotel:
         for _ in range(amount):
             self.insert_room()
             # print("room", self.last_room, "add!")
+
+    def export_csv(self, filename: str):
+        export_csv(filename)
