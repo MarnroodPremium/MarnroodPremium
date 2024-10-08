@@ -38,4 +38,4 @@ class Hotel:
             # print("room", self.last_room, "add!")
 
     def export_csv(self, filename: str):
-        export_csv(filename)
+        export_csv(tree=self.tree, filename=filename)
