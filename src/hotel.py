@@ -1,7 +1,7 @@
 from math import prod
 from typing import List
-from .tree.bplus import BPlusTree
-from .export import export_csv
+from tree.bplus import BPlusTree
+from export import export_csv
 
 class Hotel:
     def __init__(self, order: int = 5):

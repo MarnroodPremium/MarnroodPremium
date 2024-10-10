@@ -1,5 +1,5 @@
 from typing import List
-from .tree.bplus import BPlusTree
+from tree.bplus import BPlusTree
 
 def export_csv(filename: str, tree: BPlusTree, channels: List[int], manual_start: int):
     def room_to_csv(room: int) -> str:
