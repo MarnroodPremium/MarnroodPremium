@@ -1,3 +1,4 @@
+from math import prod
 from typing import List
 from .tree.bplus import BPlusTree
 from .export import export_csv
@@ -43,3 +44,27 @@ class Hotel:
         if not self.manual_guest_start:
             raise AttributeError
         export_csv(filename=filename, tree=self.tree, channels=self.checkin_channels, manual_start=self.manual_guest_start)
+
+    def get_checkin_channels_from_room(self, room_index) -> List[int]:
+        # room_index += 1
+        # print(self.checkin_channels)
+        total_rooms = self.ex_guest_start
+
+        if room_index >= total_rooms:
+            return []
+
+        checkin_channels: List[int] = [room_index % self.checkin_channels[0]]
+        # print(checkin_channels)
+
+        for channel_index, _ in enumerate(self.checkin_channels[1:-1:], 1):
+            current_total_seats = prod(self.checkin_channels[:channel_index:])
+            next_total_seats = prod(self.checkin_channels[:channel_index+1:])
+            current_channel_index = (room_index % next_total_seats) // current_total_seats
+            checkin_channels.append(current_channel_index)
+            # print(self.checkin_channels[0:channel_index:], self.checkin_channels[0:channel_index+1:])
+            # print(current_total_seats, next_total_seats)
+            # print(checkin_channels)
+
+        checkin_channels.append(room_index // prod(self.checkin_channels[:-1:]))
+
+        return checkin_channels
