@@ -46,7 +46,8 @@ class Hotel:
         export_csv(filename=filename, tree=self.tree, channels=self.checkin_channels, manual_start=self.manual_guest_start)
 
     def get_checkin_channels_from_room(self, room_index) -> List[int]:
-        # room_index += 1
+        # room number starts with 1
+        room_index -= 1
         # print(self.checkin_channels)
         total_rooms = self.ex_guest_start
 
@@ -67,4 +68,6 @@ class Hotel:
 
         checkin_channels.append(room_index // prod(self.checkin_channels[:-1:]))
 
-        return checkin_channels
+        # normalized to start with 1
+        normalized_checkin_chennels = list(map(lambda i: i+1, checkin_channels))
+        return normalized_checkin_chennels
