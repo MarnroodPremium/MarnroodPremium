@@ -1,7 +1,6 @@
 from math import prod
 from typing import List
 from tree.bplus import BPlusTree
-from export import export_csv
 
 class Hotel:
     def __init__(self, order: int = 5):
@@ -41,9 +40,26 @@ class Hotel:
             # print("room", self.last_room, "add!")
 
     def export_csv(self, filename: str):
-        if not self.manual_guest_start:
-            raise AttributeError
-        export_csv(filename=filename, tree=self.tree, channels=self.checkin_channels, manual_start=self.manual_guest_start)
+        def room_to_csv(room: int) -> str:
+            manual = False
+            if not self.manual_guest_start:
+                raise AttributeError
+            if room > self.manual_guest_start:
+                manual = True
+                channels_output = [0] * len(self.checkin_channels)
+            else:
+                channels_output = self.get_checkin_channels_from_room(room_index=room)
+
+            return f'{room},{manual},{','.join(map(str, channels_output))}\n'
+
+        rooms = self.tree.get_list()
+
+        with open(filename, "w", encoding='utf-8') as file:
+            channels_header = [f'channel{i+1}' for i in range(len(self.checkin_channels))]
+            file.write(f'room_number,is_manual_checkin,{','.join(channels_header)}\n')
+
+            for room in rooms:
+                file.write(room_to_csv(room=room))
 
     def get_checkin_channels_from_room(self, room_index) -> List[int]:
         # room number starts with 1
