@@ -341,6 +341,18 @@ class BPlusTree(object):
             node = node.prev_leaf
         print()
 
+    def get_list(self) -> list:
+        node = self.get_leftmost_leaf()
+        if not node:
+            return []
+
+        datas = []
+
+        while node:
+            datas.extend(node.keys)
+            node = node.next_leaf
+        return datas
+
     @staticmethod
     def intersperse(lst, item):
         result = [item] * (len(lst) * 2)
