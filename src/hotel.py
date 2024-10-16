@@ -12,6 +12,8 @@ class Hotel:
         self.new_guest_start: int = 1
         self.checkin_channels: List[int] = channels
 
+        self.initialize()
+
     def insert_room(self):
         self.last_room += 1
         self.tree.insert(self.last_room, self.last_room)
