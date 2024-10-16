@@ -15,12 +15,10 @@ class Hotel:
 
         self.initialize()
 
-    @track
     def insert_room(self):
         self.last_room += 1
         self.tree.insert(self.last_room, self.last_room)
 
-    @track
     def show_tree(self):
         self.tree.show_bfs()
         print(self.last_room)
@@ -39,14 +37,12 @@ class Hotel:
 
     @track
     def manual_insert(self, amount: int) -> List[int]:
-        inserted: List[int] = []
         for _ in range(amount):
             self.insert_room()
             self.ex_guest_start += 1
             self.new_guest_start += 1
-            inserted.append(self.last_room)
             # print("room", self.last_room, "add!")
-        return inserted
+        return list(range(1, amount + 1))
 
     @track
     def export_csv(self, filename: str):
@@ -76,7 +72,6 @@ class Hotel:
             for room in rooms:
                 file.write(room_to_csv(room=room))
 
-    @track
     def get_checkin_channels_from_room(self, room_index) -> List[int]:
         # room number starts with 1
         room_index -= self.new_guest_start
@@ -106,24 +101,6 @@ class Hotel:
         normalized_checkin_chennels = list(map(lambda i: i + 1, checkin_channels))
         return normalized_checkin_chennels
 
-    # function returns the origin of the room based on its index.
-    @track
-    def get_room_origin(self, room_index, tt_room, tt_space, tt_boat, tt_car):
-        if room_index > tt_room:
-            if room_index > tt_room + self.ex_guest_start:
-                return f"Room {room_index} from manual"
-            return f"Room {room_index} from 0 (Ex_Guest)"
-
-        spaceship_index = room_index // tt_space
-        boat_index = (room_index % tt_space) // tt_boat
-        car_index = (room_index % tt_boat) // tt_car
-        guest_index = room_index % tt_car
-
-        if guest_index == 0:
-            guest_index = tt_car
-
-        return f"Room {room_index} comes from: spaceship {spaceship_index+1}, boat {boat_index+1}, car {car_index+1}, guest {guest_index}"
-
     # 4) การจัดเรียงลำดับหมายเลขห้อง
     @track
     def get_all_rooms(self) -> None | List[int]:
@@ -134,8 +111,8 @@ class Hotel:
         rooms: List[int] = []
         while node:
             for value in node.values:
-                if value is not None and isinstance(value, int):
-                    rooms.append(value)
+                if value is not None and isinstance(value, list):
+                    rooms.extend(value)
             node = node.next_leaf
         return rooms
 
@@ -150,7 +127,7 @@ class Hotel:
         while node:
             for value in node.values:
                 if value is None:
-                    rooms.append(value)
+                    rooms.append(node.keys[node.values.index(value)])
             node = node.next_leaf
 
         return rooms
