@@ -6,6 +6,7 @@ class Hotel:
     def __init__(self, order: int = 5):
         self.tree = BPlusTree(order)
         self.last_room: int = 0
+        self.ex_guest: int = 0
         self.ex_guest_start: None | int = None
         self.manual_guest_start: None | int = None
         self.checkin_channels: List[int] = []
@@ -27,16 +28,16 @@ class Hotel:
         
 
     def initialize(self):
-        ex_guest = int(input("Enter amount of peoples already in the hotel : "))
+        self.ex_guest = int(input("Enter amount of peoples already in the hotel : "))
         inp = input("Enter amount of peoples/car/boat/spaceship : ")
         guest, car, boat, spaceship = map(int, inp.split("/"))
         print(f"Guests: {guest}, Cars: {car}, Boats: {boat}, Spaceships: {spaceship}")
         self.checkin_channels = [guest, car, boat, spaceship]
 
         self.ex_guest_start = guest * car * boat * spaceship
-        self.manual_guest_start = (guest * car * boat * spaceship) + ex_guest
+        self.manual_guest_start = (guest * car * boat * spaceship) + self.ex_guest
 
-        for _ in range((guest * car * boat * spaceship) + ex_guest):
+        for _ in range((guest * car * boat * spaceship) + self.ex_guest):
             self.insert_room()
 
         # return "Done"
@@ -119,3 +120,44 @@ class Hotel:
         # normalized to start with 1
         normalized_checkin_chennels = list(map(lambda i: i+1, checkin_channels))
         return normalized_checkin_chennels
+
+    # function returns the origin of the room based on its index.
+    def get_room_origin(self, room_index, tt_room, tt_space, tt_boat, tt_car):
+        if room_index > tt_room:
+            if room_index > tt_room + self.ex_guest_start:
+                return f"Room {room_index} from manual"
+            return f"Room {room_index} from 0 (Ex_Guest)"
+
+        spaceship_index = room_index // tt_space
+        boat_index = (room_index % tt_space) // tt_boat
+        car_index = (room_index % tt_boat) // tt_car
+        guest_index = room_index % tt_car
+
+        if guest_index == 0:
+            guest_index = tt_car
+
+        return f"Room {room_index} comes from: spaceship {spaceship_index+1}, boat {boat_index+1}, car {car_index+1}, guest {guest_index}"
+
+    # 4) function return linked list from b+tree -> inorder
+    def inorder_traversal(self) -> list:
+        node = self.tree.get_leftmost_leaf()
+        if not node:
+            return []
+
+        arr = []
+
+        total_rooms = self.checkin_channels[0] * self.checkin_channels[1] * self.checkin_channels[2] * self.checkin_channels[3]
+        total_seats_per_spaceship = self.checkin_channels[0] * self.checkin_channels[1] * self.checkin_channels[2]
+        total_seats_per_boat = self.checkin_channels[0] * self.checkin_channels[1]
+        total_seats_per_car = self.checkin_channels[0]
+
+        while node:
+            for node_key in node.keys:
+                arr.append((node_key, self.get_room_origin(node_key, total_rooms, total_seats_per_spaceship, total_seats_per_boat, total_seats_per_car)))
+            node = node.next_leaf
+
+        return arr
+
+    # 6) function return linked list from b+tree -> reverse order
+    def reverseorder_traversal(self) -> list:
+        return list(reversed(self.inorder_traversal()))

@@ -20,4 +20,7 @@ manrood.manual_insert()
 print(manrood.last_room)
 manrood.manual_delete()
 manrood.search_room()
+
+print(manrood.inorder_traversal())
+# print(manrood.reverseorder_traversal())
 manrood.export_csv('export.csv')
