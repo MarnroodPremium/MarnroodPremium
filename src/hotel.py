@@ -2,14 +2,15 @@ from math import prod
 from typing import List, Tuple
 from tree.bplus import BPlusTree
 
+
 class Hotel:
-    def __init__(self, order: int = 5):
+    def __init__(self, ex_guest: int, channels: List[int], order: int = 5):
         self.tree = BPlusTree(order)
         self.last_room: int = 0
-        self.ex_guest: int = 0
-        self.ex_guest_start: None | int = None
-        self.new_guest_start: None | int = None
-        self.checkin_channels: List[int] = []
+        self.ex_guest: int = ex_guest
+        self.ex_guest_start: int = prod(channels) + 1
+        self.new_guest_start: int = 1
+        self.checkin_channels: List[int] = channels
 
     def insert_room(self):
         self.last_room += 1
@@ -20,9 +21,7 @@ class Hotel:
         print(self.last_room)
 
     def initialize(self):
-        self.ex_guest = int(input("Enter amount of peoples already in the hotel : "))
-        inp = input("Enter amount of peoples/car/boat/spaceship : ")
-        guest, car, boat, spaceship = map(int, inp.split("/"))
+        guest, car, boat, spaceship = self.checkin_channels
         print(f"Guests: {guest}, Cars: {car}, Boats: {boat}, Spaceships: {spaceship}")
         self.checkin_channels = [guest, car, boat, spaceship]
 
@@ -31,8 +30,6 @@ class Hotel:
 
         for _ in range((guest * car * boat * spaceship) + self.ex_guest):
             self.insert_room()
-
-        # return "Done"
 
     def manual_insert(self, amount: int) -> List[int]:
         inserted: List[int] = []
@@ -62,8 +59,10 @@ class Hotel:
 
         rooms = self.tree.get_list()
 
-        with open(filename, "w", encoding='utf-8') as file:
-            channels_header = [f'channel{i+1}' for i in range(len(self.checkin_channels))]
+        with open(filename, "w", encoding="utf-8") as file:
+            channels_header = [
+                f"channel{i+1}" for i in range(len(self.checkin_channels))
+            ]
             file.write(f"room_number,is_manual_checkin,{','.join(channels_header)}\n")
 
             for room in rooms:
@@ -83,8 +82,10 @@ class Hotel:
 
         for channel_index, _ in enumerate(self.checkin_channels[1:-1:], 1):
             current_total_seats = prod(self.checkin_channels[:channel_index:])
-            next_total_seats = prod(self.checkin_channels[:channel_index+1:])
-            current_channel_index = (room_index % next_total_seats) // current_total_seats
+            next_total_seats = prod(self.checkin_channels[: channel_index + 1 :])
+            current_channel_index = (
+                room_index % next_total_seats
+            ) // current_total_seats
             checkin_channels.append(current_channel_index)
             # print(self.checkin_channels[0:channel_index:], self.checkin_channels[0:channel_index+1:])
             # print(current_total_seats, next_total_seats)
@@ -93,7 +94,7 @@ class Hotel:
         checkin_channels.append(room_index // prod(self.checkin_channels[:-1:]))
 
         # normalized to start with 1
-        normalized_checkin_chennels = list(map(lambda i: i+1, checkin_channels))
+        normalized_checkin_chennels = list(map(lambda i: i + 1, checkin_channels))
         return normalized_checkin_chennels
 
     # function returns the origin of the room based on its index.
@@ -144,8 +145,8 @@ class Hotel:
 
     def delete(self, room_idx: int) -> bool:
         node, i = self.tree.retrieve(room_idx)
-        if node != None:
-            node.values[i] = None
+        if node is not None:
+            node.values[i] = None  # type: ignore
             return True
         else:
             return False
@@ -163,7 +164,9 @@ class Hotel:
                     channels_output = [0] * len(self.checkin_channels)
                 else:
                     manual = False
-                    channels_output = self.get_checkin_channels_from_room(room_index=room_idx)
+                    channels_output = self.get_checkin_channels_from_room(
+                        room_index=room_idx
+                    )
                 return (manual, channels_output)
         # print("{room_idx} -> Not Found")
         return None

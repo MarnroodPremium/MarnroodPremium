@@ -1,8 +1,19 @@
 from colorama import Back
 from hotel import Hotel
 
+def initialize_hotel() -> Hotel:
+    while True:
+        try:
+            ex_guest = int(input("Enter amount of peoples already in the hotel : "))
+            channels = list(map(int, input("Enter amount of peoples car boat spaceship (seperated by space) : ").split()))
+            hotel = Hotel(ex_guest=ex_guest, channels=channels)
+            return hotel
+        except Exception as exc:
+            print(f'{Back.RED}Error: {exc}{Back.RESET}')
+            print('Try again!')
+
 def main():
-    hotel = Hotel()
+    hotel = initialize_hotel()
 
     entries = [
         'Check rooms if it is available',
@@ -37,7 +48,8 @@ def main():
         option_string = input('Select an option : ')
 
         if option_string == 'q':
-            return
+            hotel = initialize_hotel()
+            continue
         if option_string == 'n':
             return
 
