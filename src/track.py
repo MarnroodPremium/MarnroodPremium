@@ -11,10 +11,10 @@ def get_process_memory():
 def track(func):
     def wrapper(*args, **kwargs):
         mem_before = get_process_memory()
-        start = time.time()
+        start = time()
         result = func(*args, **kwargs)
         mem_after = get_process_memory()
-        elapsed_time = time.time() - start
+        elapsed_time = time() - start
         memory_used = mem_after - mem_before
         print(f"{func.__name__} statistics")
         print(f"memory consumed: {memory_used:,} bytes")
