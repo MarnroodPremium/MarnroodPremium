@@ -1,6 +1,7 @@
 from math import prod
 from typing import List
 from tree.bplus import BPlusTree
+from track import track
 
 class Hotel:
     def __init__(self, order: int = 5):
@@ -11,14 +12,17 @@ class Hotel:
         self.new_guest_start: None | int = None
         self.checkin_channels: List[int] = []
 
+    @track
     def insert_room(self):
         self.last_room += 1
         self.tree.insert(self.last_room, self.last_room)
 
+    @track
     def show_tree(self):
         self.tree.show_bfs()
         print(self.last_room)
 
+    @track
     def initialize(self):
         self.ex_guest = int(input("Enter amount of peoples already in the hotel : "))
         inp = input("Enter amount of peoples/car/boat/spaceship : ")
@@ -34,6 +38,7 @@ class Hotel:
 
         # return "Done"
 
+    @track
     def manual_insert(self):
         amount = int(input("Enter amount of peoples : "))
         for _ in range(amount):
@@ -42,6 +47,7 @@ class Hotel:
             self.new_guest_start += 1
             # print("room", self.last_room, "add!")
 
+    @track
     def export_csv(self, filename: str):
         def room_to_csv(room: int) -> str:
             manual = True
@@ -67,6 +73,7 @@ class Hotel:
             for room in rooms:
                 file.write(room_to_csv(room=room))
 
+    @track
     def get_checkin_channels_from_room(self, room_index) -> List[int]:
         # room number starts with 1
         room_index -= self.new_guest_start
@@ -95,6 +102,7 @@ class Hotel:
         return normalized_checkin_chennels
 
     # function returns the origin of the room based on its index.
+    @track
     def get_room_origin(self, room_index, tt_room, tt_space, tt_boat, tt_car):
         if room_index > tt_room:
             if room_index > tt_room + self.ex_guest_start:
@@ -112,6 +120,7 @@ class Hotel:
         return f"Room {room_index} comes from: spaceship {spaceship_index+1}, boat {boat_index+1}, car {car_index+1}, guest {guest_index}"
 
     # 4) การจัดเรียงลำดับหมายเลขห้อง
+    @track
     def print_room_inorder(self):
         node = self.tree.get_leftmost_leaf()
         if not node:
@@ -127,6 +136,7 @@ class Hotel:
         print()
 
     # 6) การแสดงจำนวนหมายเลขห้องที่ไม่มีแขกเข้าพัก (ให้ห้องพักหมายเลขมากที่สุดเป็นห้องสุดท้าย)
+    @track
     def print_missing_rooms_inorder(self):
         node = self.tree.get_leftmost_leaf()
         if not node:
@@ -150,6 +160,7 @@ class Hotel:
 
         print()
 
+    @track
     def delete(self, room_idx):
         node, i = self.tree.retrieve(room_idx)
         if node != None:
@@ -158,6 +169,7 @@ class Hotel:
         else:
             print("Not Found")
 
+    @track
     def search(self, room_idx):
         node, i = self.tree.retrieve(room_idx)
         if node != None:
