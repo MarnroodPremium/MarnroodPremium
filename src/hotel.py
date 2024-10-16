@@ -26,8 +26,8 @@ class Hotel:
         print(f"Guests: {guest}, Cars: {car}, Boats: {boat}, Spaceships: {spaceship}")
         self.checkin_channels = [guest, car, boat, spaceship]
 
-        self.ex_guest_start = guest * car * boat * spaceship
-        self.new_guest_start = 0
+        self.ex_guest_start = (guest * car * boat * spaceship) + 1
+        self.new_guest_start = 1
 
         for _ in range((guest * car * boat * spaceship) + self.ex_guest):
             self.insert_room()
@@ -44,31 +44,35 @@ class Hotel:
 
     def export_csv(self, filename: str):
         def room_to_csv(room: int) -> str:
-            manual = False
-            if not self.manual_guest_start:
+            manual = True
+            if not self.new_guest_start:
                 raise AttributeError
-            if room > self.manual_guest_start:
-                manual = True
+            if room < self.new_guest_start:
+                channels_output = [0] * len(self.checkin_channels)
+            elif room >= self.ex_guest_start:
+                manual = False
                 channels_output = [0] * len(self.checkin_channels)
             else:
+                manual = False
                 channels_output = self.get_checkin_channels_from_room(room_index=room)
 
-            return f'{room},{manual},{','.join(map(str, channels_output))}\n'
+            return f"{room},{manual},{','.join(map(str, channels_output))}\n"
 
         rooms = self.tree.get_list()
 
         with open(filename, "w", encoding='utf-8') as file:
             channels_header = [f'channel{i+1}' for i in range(len(self.checkin_channels))]
-            file.write(f'room_number,is_manual_checkin,{','.join(channels_header)}\n')
+            file.write(f"room_number,is_manual_checkin,{','.join(channels_header)}\n")
 
             for room in rooms:
                 file.write(room_to_csv(room=room))
 
+    #แก้ๆๆๆๆๆ
     def get_checkin_channels_from_room(self, room_index) -> List[int]:
         # room number starts with 1
-        room_index -= 1
+        room_index -= self.new_guest_start
         # print(self.checkin_channels)
-        total_rooms = self.ex_guest_start
+        total_rooms = self.ex_guest_start - self.new_guest_start
 
         if room_index >= total_rooms:
             return []
@@ -90,7 +94,7 @@ class Hotel:
         # normalized to start with 1
         normalized_checkin_chennels = list(map(lambda i: i+1, checkin_channels))
         return normalized_checkin_chennels
-
+    '''
     # function returns the origin of the room based on its index.
     def get_room_origin(self, room_index, tt_room, tt_space, tt_boat, tt_car):
         if room_index > tt_room:
@@ -131,3 +135,4 @@ class Hotel:
     # 6) function return linked list from b+tree -> reverse order
     def reverseorder_traversal(self) -> list:
         return list(reversed(self.inorder_traversal()))
+    '''
