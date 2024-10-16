@@ -8,7 +8,7 @@ class Hotel:
         self.last_room: int = 0
         self.ex_guest: int = 0
         self.ex_guest_start: None | int = None
-        self.manual_guest_start: None | int = None
+        self.new_guest_start: None | int = None
         self.checkin_channels: List[int] = []
 
     def insert_room(self):
@@ -27,7 +27,7 @@ class Hotel:
         self.checkin_channels = [guest, car, boat, spaceship]
 
         self.ex_guest_start = guest * car * boat * spaceship
-        self.manual_guest_start = (guest * car * boat * spaceship) + self.ex_guest
+        self.new_guest_start = 0
 
         for _ in range((guest * car * boat * spaceship) + self.ex_guest):
             self.insert_room()
@@ -38,6 +38,8 @@ class Hotel:
         amount = int(input("Enter amount of peoples : "))
         for _ in range(amount):
             self.insert_room()
+            self.ex_guest_start += 1
+            self.new_guest_start += 1
             # print("room", self.last_room, "add!")
 
     def export_csv(self, filename: str):
@@ -105,7 +107,7 @@ class Hotel:
             guest_index = tt_car
 
         return f"Room {room_index} comes from: spaceship {spaceship_index+1}, boat {boat_index+1}, car {car_index+1}, guest {guest_index}"
-
+    
     # 4) function return linked list from b+tree -> inorder
     def inorder_traversal(self) -> list:
         node = self.tree.get_leftmost_leaf()
