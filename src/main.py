@@ -19,7 +19,7 @@ def initialize_hotel() -> Hotel:
                     ).split(),
                 )
             )
-            hotel = Hotel(ex_guest=ex_guest, channels=channels)
+            hotel = Hotel(ex_guest=ex_guest, channels=channels, order=16)
             return hotel
         except Exception as exc:
             print(f"{Back.RED}Error: {exc}{Back.RESET}")
@@ -107,13 +107,14 @@ def main():
                         print("Hotel is full up to the last room")
                     else:
                         print("\n".join(map(str, rooms)))
+                        print(f'Total empty rooms : {len(rooms)}')
                 case 6:
                     filename = input("Enter filename : ")
                     hotel.export_csv(filename)
                 case _:
                     raise ValueError("Invalid option")
 
-            input('Press any button to continue')
+            input('Press enter to continue')
         except Exception as exc:
             print(f"{Back.RED}Error: {exc}{Back.RESET}")
 

@@ -127,7 +127,7 @@ class Hotel:
         while node:
             for value in node.values:
                 if value is None:
-                    rooms.append(value)
+                    rooms.append(node.keys[node.values.index(value)])
             node = node.next_leaf
 
         return rooms

@@ -16,9 +16,11 @@ def track(func):
         result = func(*args, **kwargs)
         mem_after = get_process_memory()
         elapsed_time = time() - start
-        memory_used = mem_after - mem_before
+        mem_used = mem_after - mem_before
         print(f"{Fore.YELLOW}{func.__name__} statistics")
-        print(f"memory consumed: {memory_used:,} bytes")
+        print(f"memory before: {mem_before:,} bytes")
+        print(f"memory after: {mem_after:,} bytes")
+        print(f"memory consumed: {mem_used:,} bytes")
         print(f"execution time: {elapsed_time} seconds{Fore.RESET}")
         return result
     return wrapper
