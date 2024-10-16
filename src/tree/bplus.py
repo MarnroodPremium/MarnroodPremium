@@ -358,3 +358,4 @@ class BPlusTree(object):
         result = [item] * (len(lst) * 2)
         result[0::2] = lst
         return result
+    

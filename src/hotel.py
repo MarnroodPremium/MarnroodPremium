@@ -18,6 +18,14 @@ class Hotel:
         self.tree.show_bfs()
         print(self.last_room)
 
+    def delete_node(self, room_index):
+        self.tree.delete(room_index)
+
+    def search(self, room_number):
+        return self.tree.retrieve(room_number)
+
+        
+
     def initialize(self):
         ex_guest = int(input("Enter amount of peoples already in the hotel : "))
         inp = input("Enter amount of peoples/car/boat/spaceship : ")
@@ -39,6 +47,30 @@ class Hotel:
             self.insert_room()
             # print("room", self.last_room, "add!")
 
+    def manual_delete(self):
+        delete_room = list(map(int, input("Enter room number to delete (separated by space): ").split()))    
+        for i in delete_room:
+            self.delete_node(i)
+            if i <= self.last_room and i >= 1:
+                print(f"Room {i} Deleted")
+            else:
+                print(f"Room {i} Not Found")
+
+    def search_room(self):
+        search_room = list(map(int, input("Enter room number to search (separated by space): ").split()))
+        for i in search_room:
+            result = self.search(i)
+            if result:
+                checkin_channels = self.get_checkin_channels_from_room(i)
+                if checkin_channels:  # Check if the list is not empty
+                    checkin_info = ', '.join(map(str, checkin_channels))  # Convert list of ints to a comma-separated string
+                else:
+                    checkin_info = 'Manual'
+                print(f"Room {i} Found | Room {i} Came From : {checkin_info}")
+            else:
+                print(f"Room {i} Not Found")
+
+
     def export_csv(self, filename: str):
         def room_to_csv(room: int) -> str:
             manual = False
@@ -50,13 +82,13 @@ class Hotel:
             else:
                 channels_output = self.get_checkin_channels_from_room(room_index=room)
 
-            return f'{room},{manual},{','.join(map(str, channels_output))}\n'
+            return f'{room},{manual},{",".join(map(str, channels_output))}\n'
 
         rooms = self.tree.get_list()
 
         with open(filename, "w", encoding='utf-8') as file:
             channels_header = [f'channel{i+1}' for i in range(len(self.checkin_channels))]
-            file.write(f'room_number,is_manual_checkin,{','.join(channels_header)}\n')
+            file.write(f'room_number,is_manual_checkin,{",".join(channels_header)}\n')
 
             for room in rooms:
                 file.write(room_to_csv(room=room))
