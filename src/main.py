@@ -11,7 +11,7 @@ and 1 spaceship totall
 รวม 100260 ห้อง
 """
 
-from lib.hotel import Hotel
+from hotel import Hotel
 
 manrood = Hotel()
 manrood.initialize()
@@ -21,3 +21,4 @@ print(manrood.last_room)
 
 print(manrood.inorder_traversal())
 # print(manrood.reverseorder_traversal())
+manrood.export_csv('export.csv')
