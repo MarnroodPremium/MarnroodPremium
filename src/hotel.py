@@ -111,8 +111,8 @@ class Hotel:
         rooms: List[int] = []
         while node:
             for value in node.values:
-                if value is not None and isinstance(value, int):
-                    rooms.append(value)
+                if value is not None and isinstance(value, list):
+                    rooms.extend(value)
             node = node.next_leaf
         return rooms
 

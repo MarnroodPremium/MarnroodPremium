@@ -1,8 +1,7 @@
 from time import time
 from os import getpid
-import colorama
 from psutil import Process
-from colorama import Back, Fore
+from colorama import Fore
 
 
 def get_process_memory():
