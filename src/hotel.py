@@ -122,7 +122,7 @@ class Hotel:
         while node:
             for value in node.values:
                 if value != None:
-                    print(value, end=' ')
+                    print(*value, end=' ')
             node = node.next_leaf
         print()
 
@@ -141,7 +141,7 @@ class Hotel:
             for value in node.values:
                 if value == None:
                     printed_any = True
-                    print(value, end=' ')
+                    print(node.keys[node.values.index(value)], end=' ')
             node = node.next_leaf
 
         if not printed_any:

@@ -21,5 +21,10 @@ print(manrood.last_room)
 
 #manrood.export_csv('export.csv')
 
-#manrood.print_room_inorder()
-#manrood.print_missing_rooms_inorder()
+manrood.print_room_inorder()
+manrood.print_missing_rooms_inorder()
+
+manrood.delete(34)
+
+manrood.print_room_inorder()
+manrood.print_missing_rooms_inorder()
