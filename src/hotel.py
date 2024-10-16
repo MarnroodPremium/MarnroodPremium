@@ -1,5 +1,5 @@
 from math import prod
-from typing import List
+from typing import List, Tuple
 from tree.bplus import BPlusTree
 
 class Hotel:
@@ -34,13 +34,15 @@ class Hotel:
 
         # return "Done"
 
-    def manual_insert(self):
-        amount = int(input("Enter amount of peoples : "))
+    def manual_insert(self, amount: int) -> List[int]:
+        inserted: List[int] = []
         for _ in range(amount):
             self.insert_room()
             self.ex_guest_start += 1
             self.new_guest_start += 1
+            inserted.append(self.last_room)
             # print("room", self.last_room, "add!")
+        return inserted
 
     def export_csv(self, filename: str):
         def room_to_csv(room: int) -> str:
@@ -112,57 +114,47 @@ class Hotel:
         return f"Room {room_index} comes from: spaceship {spaceship_index+1}, boat {boat_index+1}, car {car_index+1}, guest {guest_index}"
 
     # 4) การจัดเรียงลำดับหมายเลขห้อง
-    def print_room_inorder(self):
+    def get_all_rooms(self) -> None | List[int]:
         node = self.tree.get_leftmost_leaf()
         if not node:
-            print('no room')
-            return
+            return None
 
-        print('rooms inorder: ', end='')
+        rooms: List[int] = []
         while node:
             for value in node.values:
-                if value != None:
-                    print(value, end=' ')
+                if value is not None and isinstance(value, int):
+                    rooms.append(value)
             node = node.next_leaf
-        print()
+        return rooms
 
     # 6) การแสดงจำนวนหมายเลขห้องที่ไม่มีแขกเข้าพัก (ให้ห้องพักหมายเลขมากที่สุดเป็นห้องสุดท้าย)
-    def print_missing_rooms_inorder(self):
+    def get_empty_rooms(self) -> None | List[int]:
         node = self.tree.get_leftmost_leaf()
         if not node:
-            print('no room')
-            return
+            return None
 
-        expected_key = None
-        printed_any = False
-
-        print('missing rooms inorder: ', end='')
+        rooms: List[int] = []
         while node:
             for value in node.values:
-                if value == None:
-                    printed_any = True
-                    print(value, end=' ')
+                if value is None:
+                    rooms.append(value)
             node = node.next_leaf
 
-        if not printed_any:
-            print("no room without guest")
-            return
+        return rooms
 
-        print()
-
-    def delete(self, room_idx):
+    def delete(self, room_idx: int) -> bool:
         node, i = self.tree.retrieve(room_idx)
         if node != None:
             node.values[i] = None
-            print("Room Deleted")
+            return True
         else:
-            print("Not Found")
+            return False
 
-    def search(self, room_idx):
+    def search(self, room_idx: int) -> None | Tuple[bool, List[int]]:
         node, i = self.tree.retrieve(room_idx)
-        if node != None:
+        if node is not None:
             value = node.values[i]
-            if value != None:
+            if value is not None:
                 manual = True
                 if room_idx < self.new_guest_start:
                     channels_output = [0] * len(self.checkin_channels)
@@ -172,6 +164,6 @@ class Hotel:
                 else:
                     manual = False
                     channels_output = self.get_checkin_channels_from_room(room_index=room_idx)
-                print(f"{room_idx},add by manual:{manual},{','.join(map(str, channels_output))}")
-                return
-        print("Not Found")
+                return (manual, channels_output)
+        # print("{room_idx} -> Not Found")
+        return None
