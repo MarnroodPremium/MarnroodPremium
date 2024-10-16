@@ -94,7 +94,7 @@ class Hotel:
         # normalized to start with 1
         normalized_checkin_chennels = list(map(lambda i: i+1, checkin_channels))
         return normalized_checkin_chennels
-    '''
+
     # function returns the origin of the room based on its index.
     def get_room_origin(self, room_index, tt_room, tt_space, tt_boat, tt_car):
         if room_index > tt_room:
@@ -111,28 +111,48 @@ class Hotel:
             guest_index = tt_car
 
         return f"Room {room_index} comes from: spaceship {spaceship_index+1}, boat {boat_index+1}, car {car_index+1}, guest {guest_index}"
-    
-    # 4) function return linked list from b+tree -> inorder
-    def inorder_traversal(self) -> list:
+
+    # 4) การจัดเรียงลำดับหมายเลขห้อง
+    def print_room_inorder(self):
         node = self.tree.get_leftmost_leaf()
         if not node:
-            return []
+            print('no room')
+            return
 
-        arr = []
-
-        total_rooms = self.checkin_channels[0] * self.checkin_channels[1] * self.checkin_channels[2] * self.checkin_channels[3]
-        total_seats_per_spaceship = self.checkin_channels[0] * self.checkin_channels[1] * self.checkin_channels[2]
-        total_seats_per_boat = self.checkin_channels[0] * self.checkin_channels[1]
-        total_seats_per_car = self.checkin_channels[0]
-
+        print('rooms inorder: ', end='')
         while node:
-            for node_key in node.keys:
-                arr.append((node_key, self.get_room_origin(node_key, total_rooms, total_seats_per_spaceship, total_seats_per_boat, total_seats_per_car)))
+            print(' '.join(str(key) for key in node.keys), end=' ')
             node = node.next_leaf
 
-        return arr
+        print()
 
-    # 6) function return linked list from b+tree -> reverse order
-    def reverseorder_traversal(self) -> list:
-        return list(reversed(self.inorder_traversal()))
-    '''
+    # 6) การแสดงจำนวนหมายเลขห้องที่ไม่มีแขกเข้าพัก (ให้ห้องพักหมายเลขมากที่สุดเป็นห้องสุดท้าย)
+    def print_missing_rooms_inorder(self):
+        node = self.tree.get_leftmost_leaf()
+        if not node:
+            print('no room')
+            return
+
+        expected_key = None
+        printed_any = False
+
+        print('missing rooms inorder: ', end='')
+        while node:
+            for node_key in node.keys:
+                if expected_key is None:
+                    expected_key = node_key
+                else:
+                    while expected_key < node_key - 1:
+                        expected_key += 1
+                        print(expected_key, end=' ')
+                        printed_any = True
+
+                expected_key = node_key
+
+            node = node.next_leaf
+
+        if not printed_any:
+            print("no room without guest")
+            return
+
+        print()
