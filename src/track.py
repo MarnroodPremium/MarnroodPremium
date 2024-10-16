@@ -23,4 +23,5 @@ def track(func):
         print(f"memory consumed: {mem_used:,} bytes")
         print(f"execution time: {elapsed_time} seconds{Fore.RESET}")
         return result
+
     return wrapper

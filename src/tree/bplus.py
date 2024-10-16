@@ -1,4 +1,5 @@
-from math import ceil, floor
+from math import floor
+
 
 class Node:
     uid_counter = 0
@@ -21,10 +22,10 @@ class Node:
         left.parent = right.parent = self
 
         left.keys = self.keys[:mid]
-        left.values = self.values[:mid+1]
+        left.values = self.values[: mid + 1]
 
-        right.keys = self.keys[mid+1:]
-        right.values = self.values[mid+1:]
+        right.keys = self.keys[mid + 1 :]
+        right.values = self.values[mid + 1 :]
 
         self.values = [left, right]  # Setup the pointers to child nodes.
 
@@ -61,7 +62,6 @@ class Node:
 
 
 class LeafNode(Node):
-
     def __init__(self, order):
         super().__init__(order)
 
@@ -76,7 +76,9 @@ class LeafNode(Node):
 
         for i, item in enumerate(self.keys):  # Otherwise, search key and append value.
             if key == item:  # Key found => Append Value
-                self.values[i].append(value)  # Remember, this is a list of data. Not nodes!
+                self.values[i].append(
+                    value
+                )  # Remember, this is a list of data. Not nodes!
                 break
 
             elif key < item:  # Key not found && key < item => Add key before item.
@@ -89,7 +91,9 @@ class LeafNode(Node):
                 self.values.append([value])
                 break
 
-    def split(self) -> Node:  # Split a full leaf node. (Different method used than before!)
+    def split(
+        self,
+    ) -> Node:  # Split a full leaf node. (Different method used than before!)
         top = Node(self.order)
         right = LeafNode(self.order)
         mid = int(self.order // 2)
@@ -147,7 +151,9 @@ class BPlusTree(object):
     def insert(self, key, value):
         node = self.root
 
-        while not isinstance(node, LeafNode):  # While we are in internal nodes... search for leafs.
+        while not isinstance(
+            node, LeafNode
+        ):  # While we are in internal nodes... search for leafs.
             node, index = self._find(node, key)
 
         # Node is now guaranteed a LeafNode!
@@ -209,7 +215,11 @@ class BPlusTree(object):
 
                 node = node.parent
 
-            if node.is_root() and not isinstance(node, LeafNode) and len(node.values) == 1:
+            if (
+                node.is_root()
+                and not isinstance(node, LeafNode)
+                and len(node.values) == 1
+            ):
                 self.root = node.values[0]
                 self.root.parent = None
 
@@ -221,7 +231,7 @@ class BPlusTree(object):
             node.keys.insert(0, key)
             node.values.insert(0, data)
 
-            node.parent.keys[parent_index-1] = key  # Update Parent (-1 is important!)
+            node.parent.keys[parent_index - 1] = key  # Update Parent (-1 is important!)
         else:  # Inner Node Redistribution (Push-Through)
             parent_key = node.parent.keys.pop(-1)
             sibling_key = sibling.keys.pop(-1)
@@ -274,7 +284,7 @@ class BPlusTree(object):
         if node.is_root() or not node.keys:
             return None
         jnk, index = BPlusTree._find(node.parent, node.keys[0])
-        return node.parent.values[index-1] if index-1 >= 0 else None
+        return node.parent.values[index - 1] if index - 1 >= 0 else None
 
     @staticmethod
     def get_next_sibling(node: Node) -> Node:
@@ -282,11 +292,15 @@ class BPlusTree(object):
             return None
         jnk, index = BPlusTree._find(node.parent, node.keys[0])
 
-        return node.parent.values[index+1] if index+1 < len(node.parent.values) else None
+        return (
+            node.parent.values[index + 1]
+            if index + 1 < len(node.parent.values)
+            else None
+        )
 
     def show_bfs(self):
         if self.root.is_empty():
-            print('The B+ Tree is empty!')
+            print("The B+ Tree is empty!")
             return
         queue = [self.root, 0]  # Node, Height... Scrappy but it works
 
@@ -295,9 +309,14 @@ class BPlusTree(object):
             height = queue.pop(0)
 
             if not isinstance(node, LeafNode):
-                queue += self.intersperse(node.values, height+1)
-            #print(height, '|'.join(map(str, node.keys)), '\t', node.uid, '\t parent -> ', node.parent.uid if node.parent else None)
-            print(height, '|'.join(map(str, node.keys)), '\t parent -> ', node.parent.keys if node.parent else None)
+                queue += self.intersperse(node.values, height + 1)
+            # print(height, '|'.join(map(str, node.keys)), '\t', node.uid, '\t parent -> ', node.parent.uid if node.parent else None)
+            print(
+                height,
+                "|".join(map(str, node.keys)),
+                "\t parent -> ",
+                node.parent.keys if node.parent else None,
+            )
 
     def get_leftmost_leaf(self):
         if not self.root:
@@ -324,10 +343,10 @@ class BPlusTree(object):
 
         while node:
             for node_data in node.values:
-                print('[{}]'.format(', '.join(map(str, node_data))), end=' -> ')
+                print("[{}]".format(", ".join(map(str, node_data))), end=" -> ")
 
             node = node.next_leaf
-        print('Last node')
+        print("Last node")
 
     def show_all_data_reverse(self):
         node = self.get_rightmost_leaf()
@@ -336,7 +355,7 @@ class BPlusTree(object):
 
         while node:
             for node_data in reversed(node.values):
-                print('[{}]'.format(', '.join(map(str, node_data))), end=' <- ')
+                print("[{}]".format(", ".join(map(str, node_data))), end=" <- ")
 
             node = node.prev_leaf
         print()

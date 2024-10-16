@@ -107,14 +107,14 @@ def main():
                         print("Hotel is full up to the last room")
                     else:
                         print("\n".join(map(str, rooms)))
-                        print(f'Total empty rooms : {len(rooms)}')
+                        print(f"Total empty rooms : {len(rooms)}")
                 case 6:
                     filename = input("Enter filename : ")
                     hotel.export_csv(filename)
                 case _:
                     raise ValueError("Invalid option")
 
-            input('Press enter to continue')
+            input("Press enter to continue")
         except Exception as exc:
             print(f"{Back.RED}Error: {exc}{Back.RESET}")
 

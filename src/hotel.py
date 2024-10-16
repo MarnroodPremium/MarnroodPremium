@@ -132,7 +132,6 @@ class Hotel:
 
         return rooms
 
-
     @track
     def delete(self, room_idx: int) -> bool:
         node, i = self.tree.retrieve(room_idx)
