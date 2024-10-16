@@ -1,6 +1,8 @@
 from time import time
 from os import getpid
+import colorama
 from psutil import Process
+from colorama import Back, Fore
 
 
 def get_process_memory():
@@ -16,8 +18,8 @@ def track(func):
         mem_after = get_process_memory()
         elapsed_time = time() - start
         memory_used = mem_after - mem_before
-        print(f"{func.__name__} statistics")
+        print(f"{Fore.YELLOW}{func.__name__} statistics")
         print(f"memory consumed: {memory_used:,} bytes")
-        print(f"execution time: {elapsed_time} seconds")
+        print(f"execution time: {elapsed_time} seconds{Fore.RESET}")
         return result
     return wrapper

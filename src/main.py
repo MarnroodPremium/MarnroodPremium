@@ -62,10 +62,10 @@ def main():
         option_string = input("Select an option : ")
 
         if option_string == "q":
+            return
+        if option_string == "n":
             hotel = initialize_hotel()
             continue
-        if option_string == "n":
-            return
 
         try:
             option = int(option_string)
@@ -113,6 +113,7 @@ def main():
                 case _:
                     raise ValueError("Invalid option")
 
+            input('Press any button to continue')
         except Exception as exc:
             print(f"{Back.RED}Error: {exc}{Back.RESET}")
 
