@@ -45,7 +45,10 @@ class Hotel:
             manual = False
             if not self.manual_guest_start:
                 raise AttributeError
-            if room > self.manual_guest_start:
+            if room <= self.ex_guest:
+                manual = True
+                channels_output = [0] * len(self.checkin_channels)
+            elif room > self.manual_guest_start:
                 manual = True
                 channels_output = [0] * len(self.checkin_channels)
             else:
@@ -66,7 +69,14 @@ class Hotel:
         # room number starts with 1
         room_index -= 1
         # print(self.checkin_channels)
+        if not self.ex_guest_start:
+            raise AttributeError
         total_rooms = self.ex_guest_start
+
+        if room_index < self.ex_guest:
+            return []
+
+        room_index -= self.ex_guest
 
         if room_index >= total_rooms:
             return []
