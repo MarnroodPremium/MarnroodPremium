@@ -172,9 +172,9 @@ class BPlusTree(object):
 
         for i, item in enumerate(node.keys):
             if key == item:
-                return node.values[i]
+                return node, i
 
-        return None
+        return None, i
 
     def delete(self, key):
         node = self.root

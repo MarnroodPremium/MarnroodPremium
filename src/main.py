@@ -18,7 +18,8 @@ manrood.initialize()
 print(manrood.last_room)
 manrood.manual_insert()
 print(manrood.last_room)
-print(manrood.new_guest_start)
-print(manrood.ex_guest_start)
 
-manrood.export_csv('export.csv')
+#manrood.export_csv('export.csv')
+
+#manrood.print_room_inorder()
+#manrood.print_missing_rooms_inorder()

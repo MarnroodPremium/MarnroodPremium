@@ -13,7 +13,7 @@ class Hotel:
 
     def insert_room(self):
         self.last_room += 1
-        self.tree.insert(self.last_room, None)
+        self.tree.insert(self.last_room, self.last_room)
 
     def show_tree(self):
         self.tree.show_bfs()
@@ -67,7 +67,6 @@ class Hotel:
             for room in rooms:
                 file.write(room_to_csv(room=room))
 
-    #แก้ๆๆๆๆๆ
     def get_checkin_channels_from_room(self, room_index) -> List[int]:
         # room number starts with 1
         room_index -= self.new_guest_start
@@ -121,9 +120,10 @@ class Hotel:
 
         print('rooms inorder: ', end='')
         while node:
-            print(' '.join(str(key) for key in node.keys), end=' ')
+            for value in node.values:
+                if value != None:
+                    print(value, end=' ')
             node = node.next_leaf
-
         print()
 
     # 6) การแสดงจำนวนหมายเลขห้องที่ไม่มีแขกเข้าพัก (ให้ห้องพักหมายเลขมากที่สุดเป็นห้องสุดท้าย)
@@ -138,17 +138,10 @@ class Hotel:
 
         print('missing rooms inorder: ', end='')
         while node:
-            for node_key in node.keys:
-                if expected_key is None:
-                    expected_key = node_key
-                else:
-                    while expected_key < node_key - 1:
-                        expected_key += 1
-                        print(expected_key, end=' ')
-                        printed_any = True
-
-                expected_key = node_key
-
+            for value in node.values:
+                if value == None:
+                    printed_any = True
+                    print(value, end=' ')
             node = node.next_leaf
 
         if not printed_any:
@@ -156,3 +149,29 @@ class Hotel:
             return
 
         print()
+
+    def delete(self, room_idx):
+        node, i = self.tree.retrieve(room_idx)
+        if node != None:
+            node.values[i] = None
+            print("Room Deleted")
+        else:
+            print("Not Found")
+
+    def search(self, room_idx):
+        node, i = self.tree.retrieve(room_idx)
+        if node != None:
+            value = node.values[i]
+            if value != None:
+                manual = True
+                if room_idx < self.new_guest_start:
+                    channels_output = [0] * len(self.checkin_channels)
+                elif room_idx >= self.ex_guest_start:
+                    manual = False
+                    channels_output = [0] * len(self.checkin_channels)
+                else:
+                    manual = False
+                    channels_output = self.get_checkin_channels_from_room(room_index=room_idx)
+                print(f"{room_idx},add by manual:{manual},{','.join(map(str, channels_output))}")
+                return
+        print("Not Found")
