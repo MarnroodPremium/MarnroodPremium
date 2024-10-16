@@ -53,26 +53,47 @@ class Hotel:
 
         return f"Room {room_index} comes from: spaceship {spaceship_index+1}, boat {boat_index+1}, car {car_index+1}, guest {guest_index}"
 
-    # 4) function return linked list from b+tree -> inorder
-    def inorder_traversal(self) -> list:
+    # 4) การจัดเรียงลำดับหมายเลขห้อง
+    def print_room_inorder(self):
         node = self.tree.get_leftmost_leaf()
         if not node:
-            return []
+            print('no room')
+            return
+        
+        print('rooms inorder: ', end='')
+        while node:
+            print(' '.join(str(key) for key in node.keys), end=' ')
+            node = node.next_leaf
 
-        arr = []
+        print()
+    
+    # 6) การแสดงจำนวนหมายเลขห้องที่ไม่มีแขกเข้าพัก (ให้ห้องพักหมายเลขมากที่สุดเป็นห้องสุดท้าย)
+    def print_missing_rooms_inorder(self):
+        node = self.tree.get_leftmost_leaf()
+        if not node:
+            print('no room')
+            return
 
-        total_rooms = guest * car * boat * spaceship
-        total_seats_per_spaceship = guest * car * boat
-        total_seats_per_boat = guest * car
-        total_seats_per_car = guest
+        expected_key = None
+        printed_any = False
 
+        print('missing rooms inorder: ', end='')
         while node:
             for node_key in node.keys:
-                arr.append((node_key, self.get_room_origin(node_key, total_rooms, total_seats_per_spaceship, total_seats_per_boat, total_seats_per_car)))
-            node = node.next_leaf
-        
-        return arr
+                if expected_key is None:
+                    expected_key = node_key
+                else:
+                    while expected_key < node_key - 1:
+                        expected_key += 1
+                        print(expected_key, end=' ')
+                        printed_any = True
 
-    # 6) function return linked list from b+tree -> reverse order
-    def reverseorder_traversal(self) -> list:
-        return list(reversed(self.inorder_traversal()))
+                expected_key = node_key
+
+            node = node.next_leaf
+
+        if not printed_any:
+            print("no room without guest")
+            return
+        
+        print()
