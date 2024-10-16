@@ -1,5 +1,6 @@
 from colorama import Back, Fore
 from hotel import Hotel
+from track import get_process_memory
 
 
 def initialize_hotel() -> Hotel:
@@ -15,7 +16,7 @@ def initialize_hotel() -> Hotel:
                 map(
                     int,
                     input(
-                        f"{Fore.CYAN}Enter amount of peoples car boat spaceship (seperated by space) : {Fore.RESET}"
+                        f"{Fore.MAGENTA}Enter amount of peoples car boat spaceship (seperated by space) : {Fore.RESET}"
                     ).split(),
                 )
             )
@@ -36,6 +37,7 @@ def main():
         "Print all rooms with guest",
         "Print all empty rooms",
         "Export as csv",
+        "Get memory usage",
     ]
 
     LONGEST_ENTRY = max(map(len, entries))
@@ -45,7 +47,7 @@ def main():
     LINE_SEPERATOR = "="
 
     while True:
-        print(LINE_SEPERATOR * LINE_WIDTH)
+        print(Fore.CYAN + (LINE_SEPERATOR * LINE_WIDTH))
 
         print(f"{'Marnrood Premium':^{LINE_WIDTH}}")
         print()
@@ -57,7 +59,7 @@ def main():
         print(f"{' '*LEFT_PAD}n Initialize new hotel")
         print(f"{' '*LEFT_PAD}q Exit program")
 
-        print(LINE_SEPERATOR * LINE_WIDTH)
+        print((LINE_SEPERATOR * LINE_WIDTH) + Fore.RESET)
 
         option_string = input("Select an option : ")
 
@@ -95,12 +97,14 @@ def main():
                             print(f"{room} -> Not Found")
                 case 4:
                     rooms = hotel.get_all_rooms()
+                    input("Fetched rooms. Press enter to start displaying.")
                     if rooms is None:
                         print("Empty hotel")
                     else:
                         print("\n".join(map(str, rooms)))
                 case 5:
                     rooms = hotel.get_empty_rooms()
+                    input("Fetched rooms. Press enter to start displaying.")
                     if rooms is None:
                         print("Empty hotel")
                     elif not rooms:
@@ -111,6 +115,10 @@ def main():
                 case 6:
                     filename = input("Enter filename : ")
                     hotel.export_csv(filename)
+                case 7:
+                    print(
+                        f"{Fore.YELLOW}Current memory usage: {get_process_memory():,} bytes{Fore.RESET}"
+                    )
                 case _:
                     raise ValueError("Invalid option")
 
