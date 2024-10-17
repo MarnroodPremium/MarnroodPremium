@@ -2,29 +2,31 @@ from colorama import Back, Fore
 from hotel import Hotel
 from track import get_process_memory
 
+CHANNELS_NAME = [
+    "passengers in a car",
+    "cars",
+    "boats",
+    "spaceships",
+    "existing guests",
+]
+
 
 def initialize_hotel() -> Hotel:
     print(f"{Fore.GREEN}Hotel Initialization{Fore.RESET}")
-    while True:
-        try:
-            ex_guest = int(
-                input(
-                    f"{Fore.BLUE}Enter amount of peoples already in the hotel : {Fore.RESET}"
+    channels = [0] * len(CHANNELS_NAME)
+    for index, name in enumerate(CHANNELS_NAME):
+        while True:
+            try:
+                value = int(
+                    input(f"{Fore.BLUE}Channel {index+1} ({name}) value : {Fore.RESET}")
                 )
-            )
-            channels = list(
-                map(
-                    int,
-                    input(
-                        f"{Fore.MAGENTA}Enter amount of peoples car boat spaceship (seperated by space) : {Fore.RESET}"
-                    ).split(),
-                )
-            )
-            hotel = Hotel(ex_guest=ex_guest, channels=channels, order=16)
-            return hotel
-        except Exception as exc:
-            print(f"{Back.RED}Error: {exc}{Back.RESET}")
-            print("Try again!")
+                channels[index] = value
+                break
+            except ValueError as exc:
+                print(f"{Back.RED}Error: {exc}{Back.RESET}")
+                print("Try again!")
+    hotel = Hotel(channels=channels, order=16)
+    return hotel
 
 
 def main():
@@ -36,7 +38,7 @@ def main():
         "Manually check-out guests",
         "Print all rooms with guest",
         "Print all empty rooms",
-        "Export as csv",
+        "Export as text file",
         "Get memory usage",
     ]
 
@@ -114,7 +116,7 @@ def main():
                         print(f"Total empty rooms : {len(rooms)}")
                 case 6:
                     filename = input("Enter filename : ")
-                    hotel.export_csv(filename)
+                    hotel.export_as_file(filename)
                 case 7:
                     print(
                         f"{Fore.YELLOW}Current memory usage: {get_process_memory():,} bytes{Fore.RESET}"

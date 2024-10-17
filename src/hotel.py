@@ -5,10 +5,10 @@ from track import track
 
 
 class Hotel:
-    def __init__(self, ex_guest: int, channels: List[int], order: int = 5):
+    def __init__(self, channels: List[int], order: int = 5):
         self.tree = BPlusTree(order)
         self.last_room: int = 0
-        self.ex_guest: int = ex_guest
+        self.ex_guest: int = channels.pop()
         self.ex_guest_start: int = prod(channels) + 1
         self.new_guest_start: int = 1
         self.checkin_channels: List[int] = channels
@@ -23,10 +23,28 @@ class Hotel:
         self.tree.show_bfs()
         print(self.last_room)
 
+    def room_to_text(self, room: int) -> str:
+        if not self.new_guest_start:
+            raise AttributeError
+
+        # manual check-in
+        if room < self.new_guest_start:
+            return f"{room}_manual\n"
+
+        # ex-guest
+        if room >= self.ex_guest_start:
+            channels_output = [0] * len(self.checkin_channels)
+            channels_output.append(1)
+        # from main channels
+        else:
+            channels_output = self.get_checkin_channels_from_room(room_index=room)
+            channels_output.append(0)
+
+        return f"{room}_{'_'.join(map(str, channels_output))}\n"
+
     @track
     def initialize(self):
         guest, car, boat, spaceship = self.checkin_channels
-        print(f"Guests: {guest}, Cars: {car}, Boats: {boat}, Spaceships: {spaceship}")
         self.checkin_channels = [guest, car, boat, spaceship]
 
         self.ex_guest_start = (guest * car * boat * spaceship) + 1
@@ -45,32 +63,12 @@ class Hotel:
         return list(range(1, amount + 1))
 
     @track
-    def export_csv(self, filename: str):
-        def room_to_csv(room: int) -> str:
-            manual = True
-            if not self.new_guest_start:
-                raise AttributeError
-            if room < self.new_guest_start:
-                channels_output = [0] * len(self.checkin_channels)
-            elif room >= self.ex_guest_start:
-                manual = False
-                channels_output = [0] * len(self.checkin_channels)
-            else:
-                manual = False
-                channels_output = self.get_checkin_channels_from_room(room_index=room)
-
-            return f"{room},{manual},{','.join(map(str, channels_output))}\n"
-
+    def export_as_file(self, filename: str):
         rooms = self.tree.get_list()
 
         with open(filename, "w", encoding="utf-8") as file:
-            channels_header = [
-                f"channel{i+1}" for i in range(len(self.checkin_channels))
-            ]
-            file.write(f"room_number,is_manual_checkin,{','.join(channels_header)}\n")
-
             for room in rooms:
-                file.write(room_to_csv(room=room))
+                file.write(self.room_to_text(room=room))
 
     def get_checkin_channels_from_room(self, room_index) -> List[int]:
         # room number starts with 1
