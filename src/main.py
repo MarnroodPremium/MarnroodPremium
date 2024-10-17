@@ -36,7 +36,7 @@ def main():
         "Manually check-out guests",
         "Print all rooms with guest",
         "Print all empty rooms",
-        "Export as csv",
+        "Export as text file",
         "Get memory usage",
     ]
 
@@ -114,7 +114,7 @@ def main():
                         print(f"Total empty rooms : {len(rooms)}")
                 case 6:
                     filename = input("Enter filename : ")
-                    hotel.export_csv(filename)
+                    hotel.export_as_file(filename)
                 case 7:
                     print(
                         f"{Fore.YELLOW}Current memory usage: {get_process_memory():,} bytes{Fore.RESET}"
