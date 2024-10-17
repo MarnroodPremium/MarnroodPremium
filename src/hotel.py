@@ -5,10 +5,10 @@ from track import track
 
 
 class Hotel:
-    def __init__(self, ex_guest: int, channels: List[int], order: int = 5):
+    def __init__(self, channels: List[int], order: int = 5):
         self.tree = BPlusTree(order)
         self.last_room: int = 0
-        self.ex_guest: int = ex_guest
+        self.ex_guest: int = channels.pop()
         self.ex_guest_start: int = prod(channels) + 1
         self.new_guest_start: int = 1
         self.checkin_channels: List[int] = channels
@@ -45,7 +45,6 @@ class Hotel:
     @track
     def initialize(self):
         guest, car, boat, spaceship = self.checkin_channels
-        print(f"Guests: {guest}, Cars: {car}, Boats: {boat}, Spaceships: {spaceship}")
         self.checkin_channels = [guest, car, boat, spaceship]
 
         self.ex_guest_start = (guest * car * boat * spaceship) + 1
