@@ -77,14 +77,7 @@ def main():
                 case 1:
                     rooms = map(int, input("Enter room numbers : ").split())
                     for room in rooms:
-                        result = hotel.search(room)
-                        if result:
-                            manual, channels = result
-                            print(
-                                f"{room} -> Manual check-in: {manual},{','.join(map(str, channels))}"
-                            )
-                        else:
-                            print(f"{room} -> Not Found")
+                        print(hotel.search(room))
                 case 2:
                     amount = int(input("Enter amount of people : "))
                     rooms = hotel.manual_insert(amount)

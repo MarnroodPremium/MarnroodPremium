@@ -123,9 +123,9 @@ class Hotel:
 
         rooms: List[int] = []
         while node:
-            for value in node.values:
+            for key, value in zip(node.keys, node.values):
                 if value is None:
-                    rooms.append(node.keys[node.values.index(value)])
+                    rooms.append(key)
             node = node.next_leaf
 
         return rooms
@@ -140,22 +140,10 @@ class Hotel:
             return False
 
     @track
-    def search(self, room_idx: int) -> None | Tuple[bool, List[int]]:
+    def search(self, room_idx: int) -> str:
         node, i = self.tree.retrieve(room_idx)
         if node is not None:
             value = node.values[i]
             if value is not None:
-                manual = True
-                if room_idx < self.new_guest_start:
-                    channels_output = [0] * len(self.checkin_channels)
-                elif room_idx >= self.ex_guest_start:
-                    manual = False
-                    channels_output = [0] * len(self.checkin_channels)
-                else:
-                    manual = False
-                    channels_output = self.get_checkin_channels_from_room(
-                        room_index=room_idx
-                    )
-                return (manual, channels_output)
-        # print("{room_idx} -> Not Found")
-        return None
+                return f"Room {room_idx} is from -> {self.room_to_text(room_idx)}"
+        return f"Room {room_idx} -> Not Found"
