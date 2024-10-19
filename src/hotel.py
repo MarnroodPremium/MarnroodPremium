@@ -64,7 +64,7 @@ class Hotel:
 
     @track
     def export_as_file(self, filename: str):
-        rooms = self.tree.get_list()
+        rooms = self.get_all_rooms()
 
         with open(filename, "w", encoding="utf-8") as file:
             for room in rooms:
