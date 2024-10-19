@@ -20,6 +20,9 @@ pip install psutil colorama
 ```
 
 # Usage
+this program was written in Python 3.12.7
+please make sure that your interpreter is compatible with Python 3.12 syntax
+
 you can start ruinning the program by
 ```sh
 python ./src/main.py
